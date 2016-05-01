@@ -32,10 +32,6 @@ except:
     raise TeleinfoException(error)
     
 try:
-    poller = select.poll()
-    poller.register(parent, select.POLLIN)
-    poller.register(sys.stdin, select.POLLIN)
-
     running = True
     while running:
         (count, data) = pi.bb_serial_read(rxPort)
@@ -47,4 +43,5 @@ finally:
         pi.bb_serial_read_close(rxPort)
         pi.stop()
     print 'Software serial ended'
+
 
