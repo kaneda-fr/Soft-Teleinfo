@@ -3,13 +3,23 @@
 # Copyright 2016, Sebastien Lacoste-Seris
 # Author: Sebastien Lacoste-Seris (Kaneda)  <sebastien@lacoste-seris.net>
 # License: GPLv3
-import os, sys, select, pigpio
+import os, sys, select, pigpio, atexit
 
 # TTY device name (link)
 ttyDeviceName = "/dev/ttyTIC"
 # RX GPIO port
-rxPort = 26
+rxPort=26
+pi=None
 
+def exit_handler():
+    print 'My application is ending!'
+    os.unlink(ttyDeviceName)
+    if pi != None:
+        pi.bb_serial_read_close(rxPort)
+        pi.stop()
+    print 'Software serial ended'
+
+atexit.register(exit_handler)
 parent, child = os.openpty()
 tty = os.ttyname(child)
 os.system('stty cs8 -icanon -echo < %s' % (tty))
@@ -39,9 +49,6 @@ try:
             os.write(parent, data)
         
 finally:
-    if pi != None:
-        pi.bb_serial_read_close(rxPort)
-        pi.stop()
-    print 'Software serial ended'
+    print 'Ending loop'
 
 
